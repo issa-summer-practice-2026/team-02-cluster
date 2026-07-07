@@ -118,14 +118,7 @@ def gauge_fraction(value: float, lo: float, hi: float) -> float:
 def gear_display(gear: object) -> str:
     """Normalize and validate a gear token; raise ``ValueError`` if unknown."""
     token = str(gear).strip().upper()
-    if token not in VALID_GEARS:
-        raise ValueError(f"invalid gear: {gear!r}")
-    return token
-
-
-def compute_telltales(inp: RawInput) -> dict[str, bool]:
-    """Decide which telltale lamps are lit from the raw inputs and thresholds."""
-    hazard = inp.hazard
+    if trd
     return {
         "left": inp.left or hazard,
         "right": inp.right or hazard,
