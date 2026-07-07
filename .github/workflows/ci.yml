@@ -10,7 +10,7 @@ permissions:
   contents: read
 
 jobs:
-  # --- JOB-UL PENTRU BACKEND (Adaptat după modelul tău, dar pus pe structura corectă) ---
+  # --- JOB-UL PENTRU BACKEND 
   backend-track:
     runs-on: ubuntu-latest
 
@@ -21,23 +21,20 @@ jobs:
       uses: actions/setup-python@v5
       with:
         python-version: "3.11"
-        cache: 'pip' # Stretch goal: cache dependencies
+        cache: 'pip'
 
     - name: Install dependencies
       run: |
         cd backend
         python -m pip install --upgrade pip
-        # Instalează dependințele specifice proiectului din dev-requirements.txt
         if [ -f dev-requirements.txt ]; then pip install -r dev-requirements.txt; fi
 
     - name: Compileall (Syntax check)
       run: |
-        # Verifică erorile de sintaxă cerute în slide
         python -m compileall backend/
 
     - name: Lint with ruff
       run: |
-        # Folosește ruff, așa cum cere proiectul ISSA
         pip install ruff
         ruff check backend/
 
@@ -59,7 +56,7 @@ jobs:
         sleep 3
         curl --fail http://127.0.0.1:8000/health
 
-  # --- JOB-UL PENTRU FRONTEND (Adăugat pentru a acoperi și cealaltă jumătate de aplicație) ---
+  # --- JOB-UL PENTRU FRONTEND 
   frontend-track:
     runs-on: ubuntu-latest
 
