@@ -1,4 +1,4 @@
-# instrument-cluster
+# Echipa 2 - Munteanu Ciprian, Ungureanu Ioan
 
 A digital automotive **instrument cluster** — the starter app for the ISSA
 Summer Practice DevOps week. It ships **fully working and green**. Your job for
@@ -183,8 +183,8 @@ docs/      getting-started · architecture · workflow  +  backlog/ (exercises)
 Both teammates: add your name and GitHub handle here (and set
 `git config user.email` to your GitHub email so your commits count).
 
-- Name — @handle
-- Name — @handle
+- Ungureanu Ioan — @ioan-ung
+- Munteanu Ciprian — @munteanuciprian
 
 ## Your DevOps tasks (this is the week) — TODO
 
