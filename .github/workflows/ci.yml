@@ -1,0 +1,87 @@
+name: Create the pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          cd backend
+          pip install -r requirements.txt
+
+      - name: Compile Python (Catch syntax errors)
+        run: python -m compileall backend/app
+
+      - name: Run Linter (Ruff)
+        run: |
+          pip install ruff
+          ruff check backend/app
+
+      - name: Run Tests with Coverage
+        run: |
+          pip install pytest pytest-cov
+          cd backend
+          pytest --cov=app --cov-report=xml tests/
+
+      - name: Upload Coverage Report Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: backend/coverage.xml
+
+      - name: Start App & Smoke Test (Boot & Curl)
+        run: |
+          cd backend
+          python -m app.__main__ &
+          sleep 3
+          curl --fail http://127.0.0.1:8000/health
+
+  frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: |
+          cd frontend
+          npm ci
+
+      - name: Run Linter
+        run: |
+          cd frontend
+          npm run lint --if-present
+
+      - name: Type-check
+        run: |
+          cd frontend
+          npx tsc --noEmit
+
+      - name: Run Vitest
+        run: |
+          cd frontend
+          npm run test --if-present
+
+      - name: Build frontend
+        run: |
+          cd frontend
+          npm run build
