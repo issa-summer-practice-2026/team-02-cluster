@@ -136,12 +136,7 @@ def derive_state(inp: RawInput) -> ClusterState:
     """Compose the full derived cluster state from raw inputs (pure)."""
     return ClusterState(
         speed_value=clamp(inp.speed_kmh, 0.0, SPEED_MAX_KMH),
-        speed_unit="km/h",
-        speed_fraction=gauge_fraction(inp.speed_kmh, 0.0, SPEED_MAX_KMH),
-        rpm=clamp(inp.rpm, 0.0, RPM_MAX),
-        rpm_fraction=gauge_fraction(inp.rpm, 0.0, RPM_MAX),
-        redline=clamp(inp.rpm, 0.0, RPM_MAX) >= REDLINE_RPM,
-        fuel_pct=clamp(inp.fuel_pct, 0.0, FUEL_MAX_PCT),
+       uel_pct, 0.0, FUEL_MAX_PCT),
         fuel_fraction=gauge_fraction(inp.fuel_pct, 0.0, FUEL_MAX_PCT),
         temp_c=clamp(inp.coolant_temp_c, TEMP_MIN_C, TEMP_MAX_C),
         temp_fraction=gauge_fraction(inp.coolant_temp_c, TEMP_MIN_C, TEMP_MAX_C),
