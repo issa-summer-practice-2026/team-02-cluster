@@ -1,4 +1,5 @@
-# instrument-cluster
+[![CI Pipeline](https://github.com/issa-summer-practice-2026/team-02-cluster/actions/workflows/ci.yml/badge.svg)](https://github.com/issa-summer-practice-2026/team-02-cluster/actions/workflows/ci.yml)
+# Echipa 2 - Munteanu Ciprian, Ungureanu Ioan
 
 A digital automotive **instrument cluster** — the starter app for the ISSA
 Summer Practice DevOps week. It ships **fully working and green**. Your job for
