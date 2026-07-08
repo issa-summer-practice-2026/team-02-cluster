@@ -1,0 +1,91 @@
+name: CI Pipeline
+ 
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+permissions:
+  contents: read
+
+jobs:
+  # --- JOB-UL PENTRU BACKEND 
+  backend:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.11"
+        cache: 'pip'
+
+    - name: Install dependencies
+      run: |
+        cd backend
+        python -m pip install --upgrade pip
+        if [ -f dev-requirements.txt ]; then pip install -r dev-requirements.txt; fi
+
+    - name: Compileall
+      run: |
+        python -m compileall backend/
+
+    - name: Lint with ruff
+      run: |
+        pip install ruff
+        ruff check backend/
+
+    - name: Test with pytest and coverage
+      run: |
+        cd backend
+        pytest --cov=app --cov-report=xml
+
+    - name: Upload coverage report
+      uses: actions/upload-artifact@v4
+      with:
+        name: backend-coverage-report
+        path: backend/coverage.xml
+
+    - name: Boot
+      run: |
+        cd backend
+        python -m app &
+        sleep 3
+        curl --fail http://127.0.0.1:8000/health
+
+  # --- JOB-UL PENTRU FRONTEND 
+  frontend:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 'lts/*'
+        cache: 'npm'
+        cache-dependency-path: frontend/package-lock.json
+
+    - name: Install dependencies
+      run: |
+        cd frontend
+        npm ci
+
+    - name: Lint
+      run: |
+        cd frontend
+        npm run lint || npx eslint .
+
+    - name: Type-check
+      run: |
+        cd frontend
+        npx tsc --noEmit
+
+    - name: Build
+      run: |
+        cd frontend
+        npm run build
