@@ -136,3 +136,9 @@ class TestDeriveState:
 
     def test_odometer_passes_through(self):
         assert derive_state(RawInput(odometer_km=42.5)).odometer_km == 42.5
+
+    def test_shift_light_at_threshold(self):
+        assert compute_telltales(RawInput(rpm=6000))["shift_light"] is True
+
+    def test_shift_light_below_threshold(self):
+        assert compute_telltales(RawInput(rpm=5999))["shift_light"] is False

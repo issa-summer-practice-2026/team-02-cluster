@@ -1,7 +1,6 @@
-<<<<<<< HEAD
 =======
 [![CI Pipeline](https://github.com/issa-summer-practice-2026/team-02-cluster/actions/workflows/ci.yml/badge.svg)](https://github.com/issa-summer-practice-2026/team-02-cluster/actions/workflows/ci.yml)
->>>>>>> 4a89da925f6541a1b68aa62f6d64f0af4d00053a
+
 # Echipa 2 - Munteanu Ciprian, Ungureanu Ioan
 
 A digital automotive **instrument cluster** — the starter app for the ISSA
