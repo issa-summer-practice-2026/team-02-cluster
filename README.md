@@ -1,5 +1,5 @@
 # Echipa 2 - Munteanu Ciprian, Ungureanu Ioan
-l
+
 A digital automotive **instrument cluster** — the starter app for the ISSA
 Summer Practice DevOps week. It ships **fully working and green**. Your job for
 the week is to build the **DevOps around it** (CI, PR/review flow, containers,
