@@ -146,3 +146,5 @@ class TestDeriveState:
     def test_shift_light_below_threshold(self):
         assert compute_telltales(RawInput(rpm=5999))["shift_light"] is False
 
+    def test_seatbelt_lit_from_toggle(self):
+        assert compute_telltales(RawInput(seatbelt=True))["seatbelt"] is True

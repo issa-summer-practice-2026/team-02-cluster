@@ -31,6 +31,7 @@ VALID_GEARS = ("P", "R", "N", "D", "1", "2", "3", "4", "5", "6")
 # Stable telltale keys exposed in /api/state (packets add new ones, never remove).
 TELLTALE_KEYS = (
     "oil", # issue 1
+     "seatbelt", #issue 2
     "left",
     "right",
     "hazard",
@@ -65,6 +66,7 @@ class RawInput:
     battery: bool = False
     bulb_out: bool = False  # lights the bulb-failure telltale; also the hyper-flash packet's seam
     oil: bool = False # issue 1
+    seatbelt: bool = False #issue 2
     odometer_km: float = 12000.0
 
 
@@ -138,6 +140,7 @@ def compute_telltales(inp: RawInput) -> dict[str, bool]:
         "check_engine": inp.check_engine,
         "battery": inp.battery,
         "oil": inp.oil, #issue 1
+        "seatbelt": inp.seatbelt, #issue 2
         "coolant": inp.coolant_temp_c >= OVERHEAT_TEMP_C,
         "low_fuel": inp.fuel_pct <= LOW_FUEL_PCT,
         "bulb_out": inp.bulb_out,
