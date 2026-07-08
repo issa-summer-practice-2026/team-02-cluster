@@ -11,7 +11,7 @@ permissions:
 
 jobs:
   # --- JOB-UL PENTRU BACKEND 
-  backend-track:
+  backend:
     runs-on: ubuntu-latest
 
     steps:
@@ -57,7 +57,7 @@ jobs:
         curl --fail http://127.0.0.1:8000/health
 
   # --- JOB-UL PENTRU FRONTEND 
-  frontend-track:
+  frontend:
     runs-on: ubuntu-latest
 
     steps:
