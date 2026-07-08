@@ -136,3 +136,6 @@ class TestDeriveState:
 
     def test_odometer_passes_through(self):
         assert derive_state(RawInput(odometer_km=42.5)).odometer_km == 42.5
+
+    def test_oil_lit_from_toggle(self):
+        assert compute_telltales(RawInput(oil=True))["oil"] is True
