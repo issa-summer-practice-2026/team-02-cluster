@@ -118,7 +118,14 @@ def gauge_fraction(value: float, lo: float, hi: float) -> float:
 def gear_display(gear: object) -> str:
     """Normalize and validate a gear token; raise ``ValueError`` if unknown."""
     token = str(gear).strip().upper()
-    if trd
+    if token not in VALID_GEARS:
+        raise ValueError(f"invalid gear: {gear!r}")
+    return token
+
+
+def compute_telltales(inp: RawInput) -> dict[str, bool]:
+    """Decide which telltale lamps are lit from the raw inputs and thresholds."""
+    hazard = inp.hazard
     return {
         "left": inp.left or hazard,
         "right": inp.right or hazard,
@@ -136,7 +143,12 @@ def derive_state(inp: RawInput) -> ClusterState:
     """Compose the full derived cluster state from raw inputs (pure)."""
     return ClusterState(
         speed_value=clamp(inp.speed_kmh, 0.0, SPEED_MAX_KMH),
-       uel_pct, 0.0, FUEL_MAX_PCT),
+        speed_unit="km/h",
+        speed_fraction=gauge_fraction(inp.speed_kmh, 0.0, SPEED_MAX_KMH),
+        rpm=clamp(inp.rpm, 0.0, RPM_MAX),
+        rpm_fraction=gauge_fraction(inp.rpm, 0.0, RPM_MAX),
+        redline=clamp(inp.rpm, 0.0, RPM_MAX) >= REDLINE_RPM,
+        fuel_pct=clamp(inp.fuel_pct, 0.0, FUEL_MAX_PCT),
         fuel_fraction=gauge_fraction(inp.fuel_pct, 0.0, FUEL_MAX_PCT),
         temp_c=clamp(inp.coolant_temp_c, TEMP_MIN_C, TEMP_MAX_C),
         temp_fraction=gauge_fraction(inp.coolant_temp_c, TEMP_MIN_C, TEMP_MAX_C),
