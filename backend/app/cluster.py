@@ -20,6 +20,7 @@ from dataclasses import dataclass
 SPEED_MAX_KMH = 260.0  # full-scale of the speedometer
 RPM_MAX = 8000.0  # full-scale of the tachometer
 REDLINE_RPM = 6500.0  # tach redline starts here; `redline` flag trips at/above
+SHIFT_LIGHT_RPM = 6000.0
 TEMP_MIN_C = 40.0  # coolant gauge low end (cold)
 TEMP_MAX_C = 130.0  # coolant gauge high end (hot)
 FUEL_MAX_PCT = 100.0  # fuel is expressed 0..100 %
@@ -38,6 +39,7 @@ TELLTALE_KEYS = (
     "coolant",
     "low_fuel",
     "bulb_out",
+    "shift_light"
 )
 
 
@@ -136,6 +138,7 @@ def compute_telltales(inp: RawInput) -> dict[str, bool]:
         "coolant": inp.coolant_temp_c >= OVERHEAT_TEMP_C,
         "low_fuel": inp.fuel_pct <= LOW_FUEL_PCT,
         "bulb_out": inp.bulb_out,
+        "shift_light": inp.rpm >= SHIFT_LIGHT_RPM,
     }
 
 
