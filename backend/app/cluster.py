@@ -20,6 +20,7 @@ from dataclasses import dataclass
 SPEED_MAX_KMH = 260.0  # full-scale of the speedometer
 RPM_MAX = 8000.0  # full-scale of the tachometer
 REDLINE_RPM = 6500.0  # tach redline starts here; `redline` flag trips at/above
+MPH_PER_KMH = 0.621371
 SHIFT_LIGHT_RPM = 6000.0
 TEMP_MIN_C = 40.0  # coolant gauge low end (cold)
 TEMP_MAX_C = 130.0  # coolant gauge high end (hot)
@@ -68,6 +69,7 @@ class RawInput:
     oil: bool = False # issue 1
     seatbelt: bool = False #issue 2
     odometer_km: float = 12000.0
+    use_mph: bool = False
 
 
 @dataclass(frozen=True)
@@ -151,8 +153,10 @@ def compute_telltales(inp: RawInput) -> dict[str, bool]:
 def derive_state(inp: RawInput) -> ClusterState:
     """Compose the full derived cluster state from raw inputs (pure)."""
     return ClusterState(
-        speed_value=clamp(inp.speed_kmh, 0.0, SPEED_MAX_KMH),
-        speed_unit="km/h",
+        speed_value=clamp(inp.speed_kmh, 0.0, SPEED_MAX_KMH) * (
+            MPH_PER_KMH if inp.use_mph else 1.0
+        ),
+        speed_unit="mph" if inp.use_mph else "km/h",
         speed_fraction=gauge_fraction(inp.speed_kmh, 0.0, SPEED_MAX_KMH),
         rpm=clamp(inp.rpm, 0.0, RPM_MAX),
         rpm_fraction=gauge_fraction(inp.rpm, 0.0, RPM_MAX),
