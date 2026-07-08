@@ -145,8 +145,12 @@ class TestDeriveState:
 
     def test_shift_light_below_threshold(self):
         assert compute_telltales(RawInput(rpm=5999))["shift_light"] is False
+
+    def test_seatbelt_lit_from_toggle(self):
+        assert compute_telltales(RawInput(seatbelt=True))["seatbelt"] is True
         
     def test_speed_in_mph(self):
         state = derive_state(RawInput(speed_kmh=100, use_mph=True))
         assert state.speed_unit == "mph"
         assert state.speed_value == pytest.approx(62.1371)
+
