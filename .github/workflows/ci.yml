@@ -27,49 +27,53 @@ jobs:
 
   # --- JOB-UL PENTRU BACKEND 
   backend:
-    runs-on: ubuntu-latest
+      runs-on: ubuntu-latest
 
-    steps:
-    - uses: actions/checkout@v4
-    
-    - name: Set up Python 3.11
-      uses: actions/setup-python@v5
-      with:
-        python-version: "3.11"
-        cache: 'pip'
+      steps:
+      - uses: actions/checkout@v4
 
-    - name: Install dependencies
-      run: |
-        cd backend
-        python -m pip install --upgrade pip
-        if [ -f dev-requirements.txt ]; then pip install -r dev-requirements.txt; fi
+      # 1. Construim imaginea completă (folosind Dockerfile-ul tău multi-stage)
+      - name: Build Docker Image
+        run: docker build -t cluster-prod .
 
-    - name: Compileall
-      run: |
-        python -m compileall backend/
+      # 2. Rulăm Lint-ul cu ruff direct într-un container temporar bazat pe Python
+      # (Sau îl lăsăm local ca să fie rapid, dar în container e mai sigur)
+      - name: Lint with ruff inside Docker
+        run: |
+          docker run --rm -v ${{ github.workspace }}:/workspace -w /workspace python:3.11-slim sh -c "pip install ruff && ruff check backend/"
 
-    - name: Lint with ruff
-      run: |
-        pip install ruff
-        ruff check backend/
+      # 3. Rulăm testele cu pytest și coverage INSIDE container
+      # Pentru a rula testele de backend cu librăriile de dev, folosim imaginea de producție, 
+      # dar instalăm rapid dev-requirements.txt înainte de a rula pytest.
+      - name: Test with pytest inside Container (Fail under 80%)
+        run: |
+          docker run --rm \
+            -v ${{ github.workspace }}/backend:/app/backend-report \
+            cluster-prod sh -c "pip install -r dev-requirements.txt && pytest --cov=app --cov-report=xml:/app/backend-report/coverage.xml --cov-fail-under=80"
 
-    - name: Test with pytest and coverage (Fail under 80%)
-      run: |
-        cd backend
-        pytest --cov=app --cov-report=xml --cov-fail-under=80
+      # 4. Upload la raportul XML (generat de container în folderul mapat mai sus)
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-coverage-report
+          path: backend/coverage.xml
 
-    - name: Upload coverage report
-      uses: actions/upload-artifact@v4
-      with:
-        name: backend-coverage-report
-        path: backend/coverage.xml
+      # 5. Boot / Smoke test: Pornim containerul de producție în fundal și testăm /health
+      - name: Boot and Smoke Test Container
+        run: |
+          # Pornim containerul în fundal mapând portul 8000
+          docker run -d -p 8000:8000 --name cluster-running cluster-prod
+          
+          # Așteptăm 3 secunde să se ridice Flask
+          sleep 3
+          
+          # Verificăm dacă ruta /health răspunde cu succes
+          curl --fail http://127.0.0.1:8000/health
+          
+          # Oprim containerul după succes
+          docker stop cluster-running
 
-    - name: Boot
-      run: |
-        cd backend
-        python -m app &
-        sleep 3
-        curl --fail http://127.0.0.1:8000/health
+
 
   # --- JOB-UL PENTRU FRONTEND 
   frontend:
