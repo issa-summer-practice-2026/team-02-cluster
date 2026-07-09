@@ -1,3 +1,6 @@
+# ISSA Automotive Cluster - Telltale Logic Rules
+# Verifies sensor inputs and computes the final states for the instrument cluster lamps
+
 """Pure, deterministic cluster logic: raw vehicle inputs -> derived cluster state.
 
 This module is the tested core of the app. It is intentionally **pure**:
