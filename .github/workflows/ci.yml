@@ -7,7 +7,7 @@ on:
     branches: [ "main" ]
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   # --- JOB-UL PENTRU BACKEND 
@@ -89,3 +89,27 @@ jobs:
       run: |
         cd frontend
         npm run build
+
+  # --- JOB-UL PENTRU AUTOMATIZARE RELEASE NOTES
+  release:
+    needs: [backend, frontend] # Așteaptă ca testele să treacă cu succes
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push' # Rulează DOAR la merge pe main
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # Permite crearea release-ului în repository
+
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0 # Descarcă tot istoricul pentru a genera corect notele
+
+    - name: Generate Release Notes
+      uses: softprops/action-gh-release@v2
+      with:
+        tag_name: v1.${{ github.run_number }}.0
+        name: Release v1.${{ github.run_number }}.0
+        draft: false
+        prerelease: false
+        generate_release_notes: true # GitHub va scrie singur lista de PR-uri și modificări!
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
