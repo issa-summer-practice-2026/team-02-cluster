@@ -1,0 +1,128 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+    types:
+      - opened
+      - edited
+      - synchronize
+
+permissions:
+  contents: write
+  pull-requests: read # Necesar pentru linterul de titluri PR
+
+jobs:
+  # --- JOB-UL PENTRU VERIFICARE TITLU PR (Conventional Commits)
+  pr-title-lint:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+    - name: Check PR Title
+      uses: amannn/action-semantic-pull-request@v5
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # --- JOB-UL PENTRU BACKEND 
+  backend:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.11"
+        cache: 'pip'
+
+    - name: Install dependencies
+      run: |
+        cd backend
+        python -m pip install --upgrade pip
+        if [ -f dev-requirements.txt ]; then pip install -r dev-requirements.txt; fi
+
+    - name: Compileall
+      run: |
+        python -m compileall backend/
+
+    - name: Lint with ruff
+      run: |
+        pip install ruff
+        ruff check backend/
+
+    - name: Test with pytest and coverage (Fail under 80%)
+      run: |
+        cd backend
+        pytest --cov=app --cov-report=xml --cov-fail-under=80
+
+    - name: Upload coverage report
+      uses: actions/upload-artifact@v4
+      with:
+        name: backend-coverage-report
+        path: backend/coverage.xml
+
+    - name: Boot
+      run: |
+        cd backend
+        python -m app &
+        sleep 3
+        curl --fail http://127.0.0.1:8000/health
+
+  # --- JOB-UL PENTRU FRONTEND 
+  frontend:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 'lts/*'
+        cache: 'npm'
+        cache-dependency-path: frontend/package-lock.json
+
+    - name: Install dependencies
+      run: |
+        cd frontend
+        npm ci
+
+    - name: Lint
+      run: |
+        cd frontend
+        npm run lint || npx eslint .
+
+    - name: Type-check
+      run: |
+        cd frontend
+        npx tsc --noEmit
+
+    - name: Build
+      run: |
+        cd frontend
+        npm run build
+
+  # --- JOB-UL PENTRU AUTOMATIZARE RELEASE NOTES
+  release:
+    needs: [backend, frontend]
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Generate Release Notes
+      uses: softprops/action-gh-release@v2
+      with:
+        tag_name: v1.${{ github.run_number }}.0
+        name: Release v1.${{ github.run_number }}.0
+        draft: false
+        prerelease: false
+        generate_release_notes: true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
