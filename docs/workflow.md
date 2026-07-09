@@ -7,6 +7,28 @@ review → green CI → merge** loop is the point.
 > Golden rule: **`main` only changes through a reviewed, green pull request.**
 > You never push to `main`, and you don't merge your own PR.
 
+# Collaboration Workflow - Team 02
+
+Pentru a asigura o colaborare eficientă și a evita conflictele majore în Git, echipa folosește următorul flux de lucru:
+
+## 1. Gestiunea Task-urilor
+* Fiecare funcționalitate nouă pornește de la un **Issue** deschis pe GitHub.
+* Task-ul este mutat în coloana *In progress* pe Cluster Board înainte de a începe implementarea.
+
+## 2. Reguli de Branching
+* Nu se scrie niciodată cod direct pe branch-ul `main`.
+* Numele branch-urilor noi trebuie să respecte convenția:
+  * Pentru funcționalități: `feat/nume-task` (ex: `feat/oil-telltale`)
+  * Pentru documentație/corecții: `docs/nume-task` sau `fix/nume-task`
+
+## 3. Sincronizarea Zilnică
+* Înainte de a trimite un Pull Request, dezvoltatorul are obligația de a trage ultimele modificări de pe `main` și de a le integra în branch-ul său local:
+  ```bash
+  git switch main
+  git pull origin main
+  git switch <branch-ul-tau>
+  git merge main
+
 ## The loop, once
 
 1. **Open an issue.** Pick an item from [backlog/](backlog/). Create a GitHub
