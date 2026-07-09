@@ -1,7 +1,5 @@
 """Endpoint tests via the Flask test client (`app.routes`)."""
 
-from app.cluster import TELLTALE_KEYS
-
 
 def test_health_ok(client):
     resp = client.get("/health")
