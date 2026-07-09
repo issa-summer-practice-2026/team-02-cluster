@@ -82,6 +82,7 @@ class ClusterState:
     rpm: float
     rpm_fraction: float
     redline: bool
+    hyperflash: bool
     fuel_pct: float
     fuel_fraction: float
     temp_c: float
@@ -106,6 +107,7 @@ class ClusterState:
             "fuel": {"pct": self.fuel_pct, "fraction": self.fuel_fraction},
             "temp": {"value_c": self.temp_c, "fraction": self.temp_fraction},
             "gear": self.gear,
+            "hyperflash": self.hyperflash,   
             "odometer_km": self.odometer_km,
             "telltales": dict(self.telltales),
         }
@@ -161,6 +163,9 @@ def derive_state(inp: RawInput) -> ClusterState:
         rpm=clamp(inp.rpm, 0.0, RPM_MAX),
         rpm_fraction=gauge_fraction(inp.rpm, 0.0, RPM_MAX),
         redline=clamp(inp.rpm, 0.0, RPM_MAX) >= REDLINE_RPM,
+        hyperflash=inp.bulb_out and (
+            inp.left or inp.right or inp.hazard
+        ),   
         fuel_pct=clamp(inp.fuel_pct, 0.0, FUEL_MAX_PCT),
         fuel_fraction=gauge_fraction(inp.fuel_pct, 0.0, FUEL_MAX_PCT),
         temp_c=clamp(inp.coolant_temp_c, TEMP_MIN_C, TEMP_MAX_C),
