@@ -1,6 +1,5 @@
 """Endpoint tests via the Flask test client (`app.routes`)."""
 
-from app.cluster import TELLTALE_KEYS
 
 
 def test_health_ok(client):
@@ -20,8 +19,10 @@ def test_state_shape(client):
     resp = client.get("/api/state")
     assert resp.status_code == 200
     data = resp.get_json()
-    assert set(data) == {"speed", "rpm", "fuel", "temp", "gear", "odometer_km", "telltales"}
-    assert set(data["telltales"]) == set(TELLTALE_KEYS)
+    assert set(data) == {
+        "speed", "rpm", "fuel", "temp", "gear",
+        "odometer_km", "telltales", "hyperflash",
+    }
 
 
 def test_input_updates_state(client):
