@@ -1,4 +1,5 @@
 [![CI Pipeline](https://github.com/issa-summer-practice-2026/team-02-cluster/actions/workflows/ci.yml/badge.svg)](https://github.com/issa-summer-practice-2026/team-02-cluster/actions/workflows/ci.yml)
+![Latest Release](https://img.shields.io/github/v/release/issa-summer-practice-2026/team-02-cluster?color=green)
 
 # Echipa 2 - Munteanu Ciprian, Ungureanu Ioan
 
